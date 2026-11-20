@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin - MovieHub</title>
+<style>
+  :root { --bg:#0f0c0b; --surface:#1a1513; --surface2:#241d1a; --line:#33292a; --text:#f3ece6; --muted:#a89c93; --accent:#f2a33a; --ink:#1b1206; --danger:#e5484d; --ok:#4cc38a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  [hidden] { display:none !important; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  a { color:var(--accent); }
+  .wrap { max-width:980px; margin:0 auto; padding:16px; }
+  h1 { font-size:22px; margin:0; }
+  h2 { font-size:18px; margin:0 0 12px; }
+  .bar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(15,12,11,.95); z-index:5; }
+  .tabs { display:flex; gap:6px; margin:16px 0; overflow-x:auto; }
+  .tabs button { padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:none; color:var(--muted); white-space:nowrap; }
+  .tabs button.on { background:var(--text); color:var(--bg); border-color:var(--text); }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:16px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:12px 0 4px; }
+  input[type=text], input[type=url], input[type=number], input[type=password], input[type=email], select, textarea {
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--text); font:inherit; }
+  textarea { min-height:100px; resize:vertical; }
+  input:focus, select:focus, textarea:focus { outline:2px solid var(--accent); outline-offset:1px; }
+  .grid2 { display:grid; gap:0 14px; grid-template-columns:1fr; }
+  @media (min-width:640px) { .grid2 { grid-template-columns:1fr 1fr; } .grid3 { grid-template-columns:1fr 1fr 1fr !important; } }
+  .grid3 { display:grid; gap:0 14px; grid-template-columns:1fr 1fr; }
+  .btn { padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); font-weight:600; }
+  .btn.primary { background:var(--accent); color:var(--ink); border-color:var(--accent); }
+  .btn.danger { color:var(--danger); border-color:#5a2a2c; }
+  .btn.small { padding:6px 10px; font-size:14px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .check { display:flex; gap:8px; align-items:center; color:var(--text); font-size:15px; margin:12px 0 0; }
+  .check input { width:18px; height:18px; }
+  .note { font-size:13px; color:var(--muted); margin:6px 0 0; }
+  .warn { background:#2a2113; border:1px solid #5b4521; color:#e8cf9d; border-radius:10px; padding:10px 12px; font-size:14px; }
+  .msg { min-height:22px; margin-top:10px; font-size:14px; }
+  .msg.err { color:var(--danger); } .msg.ok { color:var(--ok); }
+  .item { display:grid; grid-template-columns:46px 1fr auto; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--line); }
+  .item:first-child { border-top:0; }
+  .thumb { width:46px; height:69px; border-radius:6px; background:var(--surface2); object-fit:cover; display:grid; place-items:center; font-weight:700; color:var(--muted); overflow:hidden; }
+  .item h3 { margin:0; font-size:16px; } .item p { margin:0; font-size:13px; color:var(--muted); }
+  .tag { display:inline-block; padding:1px 8px; border-radius:999px; background:var(--surface2); font-size:12px; margin-right:4px; }
+  .watch-row { display:grid; gap:8px; grid-template-columns:1fr; margin-bottom:8px; }
+  @media (min-width:640px) { .watch-row { grid-template-columns:160px 1fr auto; } }
+  .yt-prev { margin-top:8px; width:200px; border-radius:8px; aspect-ratio:16/9; object-fit:cover; }
+  .login { max-width:360px; margin:12vh auto 0; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginView" class="wrap login" hidden>
+  <div class="card">
+    <h1>Admin login</h1>
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocomplete="current-password">
+    <div class="row" style="margin-top:14px"><button class="btn primary" id="loginBtn">Login</button></div>
+    <div class="msg err" id="loginMsg"></div>
+    <p class="note">First time? The password was printed in the server console when you started it for the first time.</p>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="appView" hidden>
+  <div class="bar">
+    <h1>MovieHub Admin</h1>
+    <div class="row"><a href="/" target="_blank" rel="noopener">View site ↗</a><button class="btn small" id="logoutBtn">Logout</button></div>
+  </div>
+  <div class="wrap">
+    <div id="storageWarn" class="warn" style="background:#2e1517;border-color:#6b2a2e;color:#f0b4b7" hidden>
+      <strong>Database not connected.</strong> This host erases its disk on restart, so titles you add now will disappear.
+      Add the Upstash database settings (see README) and restart the service.
+    </div>
+    <div class="tabs" id="tabs">
+      <button data-v="list" class="on">Titles</button>
+      <button data-v="form">Add / Edit</button>
+      <button data-v="site">Ads &amp; Site</button>
+      <button data-v="pass">Password</button>
+    </div>
+
+    <!-- list -->
+    <section id="v-list">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <h2 style="margin:0">All titles (<span id="count">0</span>)</h2>
+          <button class="btn primary small" id="newBtn">+ Add title</button>
+        </div>
+        <div id="list"></div>
+      </div>
+    </section>
+
+    <!-- form -->
+    <section id="v-form" hidden>
+      <form class="card" id="form" autocomplete="off">
+        <h2 id="formTitle">Add title</h2>
+        <div class="warn">Add only content you own or that is legally available — posters/trailers you have permission to use, and links to official platforms (Netflix, Prime Video, JioHotstar, YouTube official channel, etc.).</div>
+        <div class="grid2">
+          <div><label>Title name *</label><input type="text" id="f-name" required maxlength="150"></div>
+          <div><label>Type</label>
+            <select id="f-type"><option value="movie">Movie</option><option value="series">Web Series</option></select></div>
+        </div>
+        <div class="grid3">
+          <div><label>Release year</label><input type="number" id="f-year" min="1888" max="2100"></div>
+          <div><label>Language</label><input type="text" id="f-language" maxlength="40" placeholder="Hindi"></div>
+          <div><label>Rating (0-10)</label><input type="number" id="f-rating" min="0" max="10" step="0.1"></div>
+        </div>
+        <label>Genres (comma separated)</label>
+        <input type="text" id="f-genres" placeholder="Action, Thriller">
+        <label>Description</label>
+        <textarea id="f-description" maxlength="1500"></textarea>
+        <label>Poster image link (https://…)</label>
+        <input type="url" id="f-poster" placeholder="https://example.com/poster.jpg">
+        <p class="note">Use a poster you have the right to use (official press kit or your own artwork).</p>
+
+        <label>YouTube link — trailer or official clip</label>
+        <input type="text" id="f-youtube" placeholder="https://www.youtube.com/watch?v=… or Shorts link">
+        <img id="ytPrev" class="yt-prev" alt="" hidden>
+        <label class="check"><input type="checkbox" id="f-inReels"> Show this clip in the Reels feed</label>
+        <label class="check"><input type="checkbox" id="f-featured"> Feature on the home page</label>
+
+        <label style="margin-top:18px">Where to watch (official links — first one is used for "Watch Full Movie")</label>
+        <div id="watchRows"></div>
+        <button type="button" class="btn small" id="addWatch">+ Add link</button>
+
+        <div class="row" style="margin-top:20px">
+          <button class="btn primary" type="submit" id="saveBtn">Save</button>
+          <button class="btn" type="button" id="cancelBtn">Cancel</button>
+        </div>
+        <div class="msg" id="formMsg"></div>
+      </form>
+    </section>
+
+    <!-- site / ads -->
+    <section id="v-site" hidden>
+      <form class="card" id="siteForm">
+        <h2>Site details</h2>
+        <div class="grid2">
+          <div><label>Site name</label><input type="text" id="s-name" maxlength="60"></div>
+          <div><label>Contact email (shown in footer)</label><input type="email" id="s-email"></div>
+        </div>
+        <label>Tagline</label><input type="text" id="s-tagline" maxlength="200">
+
+        <h2 style="margin-top:24px">Google AdSense</h2>
+        <p class="note">Apply at adsense.google.com with your live website. After approval, paste the IDs below. Ads show only when the Publisher ID and a slot ID are filled. The site also serves <code>/ads.txt</code> automatically.</p>
+        <label>Publisher ID</label><input type="text" id="s-client" placeholder="ca-pub-1234567890123456">
+        <div class="grid3">
+          <div><label>Slot: top of home page</label><input type="text" id="s-top" placeholder="1234567890"></div>
+          <div><label>Slot: between titles</label><input type="text" id="s-inline" placeholder="1234567890"></div>
+          <div><label>Slot: title details</label><input type="text" id="s-detail" placeholder="1234567890"></div>
+        </div>
+        <p class="note">Create 3 "Display ads → Responsive" ad units in AdSense and copy each unit's slot number. Never click your own ads — Google bans accounts for that.</p>
+        <div class="row" style="margin-top:16px"><button class="btn primary" type="submit">Save settings</button></div>
+        <div class="msg" id="siteMsg"></div>
+      </form>
+    </section>
+
+    <!-- password -->
+    <section id="v-pass" hidden>
+      <form class="card" id="passForm" style="max-width:420px">
+        <h2>Change password</h2>
+        <div id="passEnv" class="warn" hidden>Your password is set by the ADMIN_PASSWORD environment variable, so change it there.</div>
+        <label>Current password</label><input type="password" id="p-cur" autocomplete="current-password">
+        <label>New password (8+ characters)</label><input type="password" id="p-new" autocomplete="new-password">
+        <div class="row" style="margin-top:16px"><button class="btn primary" type="submit">Change password</button></div>
+        <div class="msg" id="passMsg"></div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script src="/admin.js"></script>
+</body>
+</html>

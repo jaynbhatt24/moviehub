@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0c0b">
+<!--META-->
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="/" id="brand"><span class="brand-mark">▶</span><span id="siteName">MovieHub</span></a>
+  <nav class="tabs" id="tabs" aria-label="Sections">
+    <button data-tab="home" class="on">Home</button>
+    <button data-tab="movies">Movies</button>
+    <button data-tab="series">Series</button>
+    <button data-tab="reels" class="reels-tab">Reels</button>
+  </nav>
+  <input type="search" id="q" placeholder="Search title, genre, language…" aria-label="Search">
+</header>
+
+<main>
+  <section id="hero"></section>
+  <div id="adTop"></div>
+  <div id="chips" class="chips"></div>
+  <section id="grid" class="grid" aria-live="polite"></section>
+  <p id="empty" class="empty" hidden></p>
+</main>
+
+<footer class="foot">
+  <p>We don't host or stream any movie files. Every "Watch" button leads to the official platform where the title is legally available. Some links may be affiliate links.</p>
+  <p><a href="/privacy">Privacy Policy</a> · <span id="footMail"></span></p>
+</footer>
+
+<!-- Title details popup -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-bg" id="modalBg"></div>
+  <article class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="x" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalBody"></div>
+  </article>
+</div>
+
+<!-- Reels (vertical clips feed) -->
+<div id="reels" class="reels" hidden>
+  <div class="reels-bar">
+    <button class="rbtn" id="reelsClose" aria-label="Close reels">✕</button>
+    <strong>Reels</strong>
+    <button class="rbtn" id="reelMute" aria-label="Sound on or off">🔇</button>
+  </div>
+  <div id="reelList" class="reel-list"></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

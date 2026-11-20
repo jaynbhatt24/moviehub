@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy</title>
+<style>
+  body { margin:0; background:#0f0c0b; color:#f3ece6; font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 60px; }
+  a { color:#f2a33a; }
+  h1 { font-family:Georgia,serif; }
+  h2 { margin-top:28px; font-size:18px; }
+  .muted { color:#a89c93; font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="/">← Back to <span class="site">MovieHub</span></a></p>
+  <h1>Privacy Policy</h1>
+  <p class="muted">This is a general template. Please review it and adjust it to match how you run your site.</p>
+
+  <h2>What this site does</h2>
+  <p><span class="site">MovieHub</span> is a movie and web series information site. We show posters, details and trailers, and link to official platforms where a title can be watched legally. We do not host or stream any movie files.</p>
+
+  <h2>Information we collect</h2>
+  <p>We do not ask visitors to create accounts and we do not collect personal details such as names or phone numbers. Our servers may keep standard technical logs (IP address, browser type, pages visited) for security and troubleshooting.</p>
+
+  <h2>Cookies and advertising</h2>
+  <p>We use Google AdSense to show ads. Google and its partners may use cookies to serve ads based on your previous visits to this and other websites. You can opt out of personalised advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ads Settings</a>. For more details see <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">how Google uses data from sites that use its services</a>.</p>
+
+  <h2>Embedded videos</h2>
+  <p>Trailers and clips are embedded from YouTube. When you play a video, YouTube may set cookies and collect data under its own privacy policy.</p>
+
+  <h2>Third-party and affiliate links</h2>
+  <p>Buttons such as "Watch on …" lead to external websites that have their own privacy practices. Some of these links may be affiliate links, which means we may earn a commission if you subscribe or purchase, at no extra cost to you.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy? Email <span id="mail">the site owner</span>.</p>
+</main>
+<script>
+  fetch('/api/config').then(r => r.json()).then(c => {
+    document.querySelectorAll('.site').forEach(e => { e.textContent = c.siteName || 'MovieHub'; });
+    document.title = 'Privacy Policy - ' + (c.siteName || 'MovieHub');
+    if (c.contactEmail) {
+      const a = document.createElement('a');
+      a.href = 'mailto:' + c.contactEmail;
+      a.textContent = c.contactEmail;
+      document.getElementById('mail').replaceChildren(a);
+    }
+  }).catch(() => {});
+</script>
+</body>
+</html>
